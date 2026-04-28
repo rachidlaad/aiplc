@@ -1,0 +1,4 @@
+﻿
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager
+    PendingFileRenameOperations    REG_MULTI_SZ    *1\??\C:\Windows\System32\gamingservicesproxy_d.dll.0
+

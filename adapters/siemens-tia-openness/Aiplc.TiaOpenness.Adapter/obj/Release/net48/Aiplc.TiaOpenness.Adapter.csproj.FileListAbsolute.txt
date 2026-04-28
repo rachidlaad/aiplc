@@ -1,0 +1,13 @@
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/bin/Release/net48/Aiplc.TiaOpenness.Adapter.exe.config
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/bin/Release/net48/Aiplc.TiaOpenness.Adapter.exe
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/obj/Release/net48/Aiplc.TiaOpenness.Adapter.GeneratedMSBuildEditorConfig.editorconfig
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/obj/Release/net48/Aiplc.TiaOpenness.Adapter.AssemblyInfoInputs.cache
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/obj/Release/net48/Aiplc.TiaOpenness.Adapter.AssemblyInfo.cs
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/obj/Release/net48/Aiplc.TiaOpenness.Adapter.csproj.CoreCompileInputs.cache
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/obj/Release/net48/Aiplc.TiaOpenness.Adapter.sourcelink.json
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/obj/Release/net48/Aiplc.TiaOpenness.Adapter.exe
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/obj/Release/net48/Aiplc.TiaOpenness.Adapter.pdb
+/tmp/aiplc-tia-release/Aiplc.TiaOpenness.Adapter.exe.config
+/tmp/aiplc-tia-release/Aiplc.TiaOpenness.Adapter.exe
+/tmp/aiplc-tia-release/Aiplc.TiaOpenness.Adapter.pdb
+/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/bin/Release/net48/Aiplc.TiaOpenness.Adapter.pdb

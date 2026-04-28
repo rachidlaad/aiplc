@@ -1,0 +1,80 @@
+﻿21:07:07|          |CheckFreeDiskSpace                  |Test returns=true 
+21:07:07|          |UpdateSIA                           |Start of updating local copy SIA... 
+21:07:07|          |UpdateSIA                           | Version of bundle SIA: 600.0.120.1 
+21:07:08|          |UpdateSIA                           | Version of local SIA: 600.0.120.1 
+21:07:08|          |UpdateSIA                           | Local SIA is >= bundle SIA. Skip updating. 
+21:07:08|          |UpdateSIA                           | Path with SIA2.exe is set to "C:\Program Files (x86)\Common Files\Siemens\Automation\Siemens Installer Assistant\600"  
+21:07:08|          |UpdateSIA                           |End of updating local copy SIA... 
+21:07:08|          |StartSIA                            | Silent mode from sia.ini = NO 
+21:07:08|          |StartSIA                            | Reboot mode from sia.ini = YES 
+21:07:08|          |GetLangString                       |LangKey: FileNotFound 
+21:07:08|          |GetLangString                       |return LangKey: FileNotFound| Result: File %s not found ! 
+21:07:08|          |GetLangString                       |LangKey: MinResolution 
+21:07:08|          |GetLangString                       |return LangKey: MinResolution| Result: In order to run| setup requires a screen resolution of at least %dx%d! Please restart setup with this resolution or a higher one. 
+21:07:08|          |GetLangString                       |LangKey: RebootMessage 
+21:07:08|          |GetLangString                       |return LangKey: RebootMessage| Result: You must restart your computer before you can run setup. Do you want to reboot your computer now? 
+21:07:08|          |GetLangString                       |LangKey: InstallErrorMessage 
+21:07:08|          |GetLangString                       |return LangKey: InstallErrorMessage| Result: An error occurred during the installation of %s. 
+21:07:08|          |StartSIA                            |Check for ReservedPathLength (at least 50) 
+21:07:08|          |StartSIA                            |ReservedPathLength: 120 
+21:07:08|          |GetLangString                       |LangKey: CheckPrerequisites 
+21:07:08|          |GetLangString                       |return LangKey: CheckPrerequisites| Result: Checking prerequisites... 
+21:07:08|          |                                    |SetProgress: Checking prerequisites... 
+21:07:08|          |StartSIA                            |Check for x64Allowed 
+21:07:08|          |StartSIA                            |Check for admin rights 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Start function LaunchAppGetExitCodeSchell... 
+21:07:09|          |LaunchAppGetExitCodeSchell          |TaskName= 
+21:07:09|          |LaunchAppGetExitCodeSchell          |TaskCommand=1 
+21:07:09|          |LaunchAppGetExitCodeSchell          |ExeToStartPath= 
+21:07:09|          |LaunchAppGetExitCodeSchell          |ExeToStartArgs= 
+21:07:09|          |LaunchAppGetExitCodeSchell          |UserContext(/RU)= 
+21:07:09|          |LaunchAppGetExitCodeSchell          |bWait=1 
+21:07:09|          |LaunchAppGetExitCodeSchell          |bSilent=0 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Set default TaskName=ContinueAfterReboot_SIAStarter 
+21:07:09|          |LaunchAppGetExitCodeSchell          |SetTaskParams=/delete /f /tn ContinueAfterReboot_SIAStarter 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Try to start schtasks.exe with param /delete /f /tn ContinueAfterReboot_SIAStarter 
+21:07:09|          |LaunchAppGetExitCodeSchell          |bRetShell=1 
+21:07:09|          |LaunchAppGetExitCodeSchell          |ShellExecuteEx successfully starts file=schtasks.exe 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Wait for exit started process... 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Started process exits with errocode=1 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Return from function with errorcode=1 
+21:07:09|          |StartSIA                            |Check for screen resolution 
+21:07:09|          |StartSIA                            |DisplaySize requested: 800x480 
+21:07:09|          |StartSIA                            |DisplaySize found: 1920x1080 
+21:07:09|          |StartSIA                            |Not Silent mode| test screen resolution 
+21:07:09|          |StartSIA                            |Check for installed IE 
+21:07:09|          |StartSIA                            |Found IE: 922621 
+21:07:09|          |GetLangString                       |LangKey: CheckPrerequisites 
+21:07:09|          |GetLangString                       |return LangKey: CheckPrerequisites| Result: Checking prerequisites... 
+21:07:09|          |                                    |SetProgress: Checking prerequisites... 
+21:07:09|          |StartSIA                            |Check for MSI version 
+21:07:09|          |StartSIA                            |MsiVersion found 5.0.22621.6133 
+21:07:09|          |StartSIA                            |Check for installed .Net versions 
+21:07:09|          |StartSIA                            |Detected installed .NET versions: 
+21:07:09|          |StartSIA                            | 2.0.50727.9179 
+21:07:09|          |StartSIA                            | 3.5.30729.9151 
+21:07:09|          |StartSIA                            | 4.8.9310.0 
+21:07:09|          |StartSIA                            | 4.8.9032.0 
+21:07:09|          |StartSIA                            |.NET is present. SIA can start. 
+21:07:09|          |StartSIA                            |Check for PendingFileRenameOperations 
+21:07:09|          |CheckPendingFile                    |Test PendingFileRenameOperations 
+21:07:09|          |CheckPendingFile                    |Found PendingFileRenameOperations 
+21:07:09|          |LogPendingFileRenameOperations      |Session Manager key registry key found 
+21:07:09|          |LogPendingFileRenameOperations      |PFRO result is ERROR_MORE_DATA 
+21:07:09|          |LogPendingFileRenameOperations      |PFRO result is ERROR_SUCCESS 
+21:07:09|          |LogPendingFileRenameOperations      |Iterate through the loop to remove the  
+21:07:09|          |LogPendingFileRenameOperations      |PendingFileRenameOperations registry entries are: 
+21:07:09|          |LogPendingFileRenameOperations      |*1\??\C:\Windows\System32\gamingservicesproxy_d.dll.0 
+21:07:09|          |CheckPendingFile                    |Logging of pending file rename operations is successful 
+21:07:10|          |IsRebootRequired                    |Record mode condition not satisfied hence reboot condition fulfilled 
+21:07:10|          |StartSIA                            |PendingFileRenameOperations Reboot is needed 
+21:07:10|          |GetLangString                       |LangKey: SetupCaption 
+21:07:10|          |GetLangString                       |return LangKey from SIA.ini: SetupCaption| Result: TIA Portal V21 STEP 7 + STEP 7 Safety + WinCC - Setup 
+21:07:10|          |GetLangString                       |LangKey: RebootMessage 
+21:07:10|          |GetLangString                       |return LangKey: RebootMessage| Result: You must restart your computer before you can run setup. Do you want to reboot your computer now? 
+21:07:10|          |GetLangString                       |LangKey: ButtonReadme 
+21:07:10|          |GetLangString                       |return LangKey: ButtonReadme| Result: &Show readme 
+21:07:10|          |GetLangString                       |LangKey: ButtonYes 
+21:07:10|          |GetLangString                       |return LangKey: ButtonYes| Result: &Yes 
+21:07:10|          |GetLangString                       |LangKey: ButtonNo 
+21:07:10|          |GetLangString                       |return LangKey: ButtonNo| Result: &No 

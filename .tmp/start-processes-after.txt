@@ -1,0 +1,10 @@
+﻿
+
+Name           : Start.exe
+ProcessId      : 9160
+CreationDate   : 4/19/2026 9:18:03 PM
+ExecutablePath : C:\TIA_V21\DVD1\Start.exe
+CommandLine    : "C:\TIA_V21\DVD1\Start.exe" 
+
+
+

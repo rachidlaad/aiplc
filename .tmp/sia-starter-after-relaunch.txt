@@ -1,0 +1,120 @@
+﻿21:07:08|          |StartSIA                            |Check for x64Allowed 
+21:07:08|          |StartSIA                            |Check for admin rights 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Start function LaunchAppGetExitCodeSchell... 
+21:07:09|          |LaunchAppGetExitCodeSchell          |TaskName= 
+21:07:09|          |LaunchAppGetExitCodeSchell          |TaskCommand=1 
+21:07:09|          |LaunchAppGetExitCodeSchell          |ExeToStartPath= 
+21:07:09|          |LaunchAppGetExitCodeSchell          |ExeToStartArgs= 
+21:07:09|          |LaunchAppGetExitCodeSchell          |UserContext(/RU)= 
+21:07:09|          |LaunchAppGetExitCodeSchell          |bWait=1 
+21:07:09|          |LaunchAppGetExitCodeSchell          |bSilent=0 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Set default TaskName=ContinueAfterReboot_SIAStarter 
+21:07:09|          |LaunchAppGetExitCodeSchell          |SetTaskParams=/delete /f /tn ContinueAfterReboot_SIAStarter 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Try to start schtasks.exe with param /delete /f /tn ContinueAfterReboot_SIAStarter 
+21:07:09|          |LaunchAppGetExitCodeSchell          |bRetShell=1 
+21:07:09|          |LaunchAppGetExitCodeSchell          |ShellExecuteEx successfully starts file=schtasks.exe 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Wait for exit started process... 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Started process exits with errocode=1 
+21:07:09|          |LaunchAppGetExitCodeSchell          |Return from function with errorcode=1 
+21:07:09|          |StartSIA                            |Check for screen resolution 
+21:07:09|          |StartSIA                            |DisplaySize requested: 800x480 
+21:07:09|          |StartSIA                            |DisplaySize found: 1920x1080 
+21:07:09|          |StartSIA                            |Not Silent mode| test screen resolution 
+21:07:09|          |StartSIA                            |Check for installed IE 
+21:07:09|          |StartSIA                            |Found IE: 922621 
+21:07:09|          |GetLangString                       |LangKey: CheckPrerequisites 
+21:07:09|          |GetLangString                       |return LangKey: CheckPrerequisites| Result: Checking prerequisites... 
+21:07:09|          |                                    |SetProgress: Checking prerequisites... 
+21:07:09|          |StartSIA                            |Check for MSI version 
+21:07:09|          |StartSIA                            |MsiVersion found 5.0.22621.6133 
+21:07:09|          |StartSIA                            |Check for installed .Net versions 
+21:07:09|          |StartSIA                            |Detected installed .NET versions: 
+21:07:09|          |StartSIA                            | 2.0.50727.9179 
+21:07:09|          |StartSIA                            | 3.5.30729.9151 
+21:07:09|          |StartSIA                            | 4.8.9310.0 
+21:07:09|          |StartSIA                            | 4.8.9032.0 
+21:07:09|          |StartSIA                            |.NET is present. SIA can start. 
+21:07:09|          |StartSIA                            |Check for PendingFileRenameOperations 
+21:07:09|          |CheckPendingFile                    |Test PendingFileRenameOperations 
+21:07:09|          |CheckPendingFile                    |Found PendingFileRenameOperations 
+21:07:09|          |LogPendingFileRenameOperations      |Session Manager key registry key found 
+21:07:09|          |LogPendingFileRenameOperations      |PFRO result is ERROR_MORE_DATA 
+21:07:09|          |LogPendingFileRenameOperations      |PFRO result is ERROR_SUCCESS 
+21:07:09|          |LogPendingFileRenameOperations      |Iterate through the loop to remove the  
+21:07:09|          |LogPendingFileRenameOperations      |PendingFileRenameOperations registry entries are: 
+21:07:09|          |LogPendingFileRenameOperations      |*1\??\C:\Windows\System32\gamingservicesproxy_d.dll.0 
+21:07:09|          |CheckPendingFile                    |Logging of pending file rename operations is successful 
+21:07:10|          |IsRebootRequired                    |Record mode condition not satisfied hence reboot condition fulfilled 
+21:07:10|          |StartSIA                            |PendingFileRenameOperations Reboot is needed 
+21:07:10|          |GetLangString                       |LangKey: SetupCaption 
+21:07:10|          |GetLangString                       |return LangKey from SIA.ini: SetupCaption| Result: TIA Portal V21 STEP 7 + STEP 7 Safety + WinCC - Setup 
+21:07:10|          |GetLangString                       |LangKey: RebootMessage 
+21:07:10|          |GetLangString                       |return LangKey: RebootMessage| Result: You must restart your computer before you can run setup. Do you want to reboot your computer now? 
+21:07:10|          |GetLangString                       |LangKey: ButtonReadme 
+21:07:10|          |GetLangString                       |return LangKey: ButtonReadme| Result: &Show readme 
+21:07:10|          |GetLangString                       |LangKey: ButtonYes 
+21:07:10|          |GetLangString                       |return LangKey: ButtonYes| Result: &Yes 
+21:07:10|          |GetLangString                       |LangKey: ButtonNo 
+21:07:10|          |GetLangString                       |return LangKey: ButtonNo| Result: &No 
+21:18:03|          |                                    |   ***   SIA-Starter   ***    
+21:18:03|          |                                    |Start at		: 2026-04-19; 21:18:03 
+21:18:03|          |                                    |Commandline_org:  
+21:18:03|          |                                    |Commandline_int:  
+21:18:03|          |                                    |Version		: 600.0.120.1 
+21:18:03|          |                                    |Date			: 2025-10-07 
+21:18:03|          |                                    |BootTime		: 0d 0h 13m 22s 
+21:18:03|          |                                    |OS ver			: 10.0 SP:0.0  BN:22631 PType:1 
+21:18:03|          |                                    |OS arc			: 64 
+21:18:03|          |                                    |OS language	: 1033 
+21:18:03|          |                                    |PC name		: DESKTOP-8DACNP1 
+21:18:03|          |                                    |RAM API		: 16190 
+21:18:03|          |                                    |HDD c:			: 60243 MB 
+21:18:03|          |CheckBundlePath                     |Start of checking access to bundle path... 
+21:18:03|          |CheckBundlePath                     | Bundlepath not found in command line arguments 
+21:18:03|          |CheckBundlePath                     |End of checking access to bundle path... 
+21:18:03|          |ADSSetAllPath                       |Start Initialize common pathes... 
+21:18:03|          |ADSSetAllPath                       | Temp path: C:\Users\intel\AppData\Local\Temp\ 
+21:18:03|          |ADSSetAllPath                       | Starter path: C:\TIA_V21\DVD1\Start.exe 
+21:18:03|          |ADSSetAllPath                       | Current dir: C:\TIA_V21\DVD1\ 
+21:18:04|          |ADSSetAllPath                       | Current Commondir: C:\Program Files (x86)\Common Files\Siemens\Automation\Siemens Installer Assistant 
+21:18:04|          |ADSSetAllPath                       |look for sia.cfg path: C:\TIA_V21\DVD1\sia.cfg 
+21:18:04|          |ADSSetAllPath                       |look for: C:\TIA_V21\DVD1\InstData\Resources\SIA2.ini return 1| errorcode : 2 
+21:18:04|          |ADSSetAllPath                       |look for: C:\TIA_V21\DVD1\InstData\Resources\SIA.ini return 0| errorcode : 183 
+21:18:04|          |ADSSetAllPath                       |sia.cfg not found| Path: C:\TIA_V21\DVD1\InstData\ 
+21:18:04|          |ADSSetAllPath                       |CurrentPath: C:\TIA_V21\DVD1\InstData\ 
+21:18:04|          |ADSSetAllPath                       |Current ResourcesPath: C:\TIA_V21\DVD1\InstData\Resources\ 
+21:18:04|          |ADSSetAllPath                       |Search SIA2.ini at: C:\TIA_V21\DVD1\InstData\Resources\SIA2.ini 
+21:18:04|          |ADSSetAllPath                       |Get CopyFile from C:\TIA_V21\DVD1\InstData\Resources\SIA2.ini returns Sia.Engine.dll;Setup.Core.dll;Sia2.exe 
+21:18:04|          |ADSSetAllPath                       |SIA2.ini found| use Sia2.ini from: C:\TIA_V21\DVD1\InstData\Resources\SIA2.ini 
+21:18:04|          |CLanguage::Init                     |BundleTitleShort: TIA Portal STEP 7 V21 - WinCC V21 
+21:18:04|          |CLanguage::Init                     |BundleTitle: SIMATIC TIA Portal STEP 7 V21 - WinCC V21 
+21:18:04|          |CLanguage::Init                     |Copyright: © Siemens 2008 21:18:04|          |CLanguage::Init                     |CheckAdmin: 1 
+21:18:04|          |CLanguage::Init                     |Read SIA.ini| STARTER section: C:\TIA_V21\DVD1\InstData\Resources\SIA2.ini 
+21:18:04|          |CLanguage::Init                     |Search SIA2_xxx.ulf files: C:\TIA_V21\DVD1\InstData\Resources\SIA2*.ulf 
+21:18:04|          |CLanguage::Init                     |Found some SIA2_xxx.ulf files| read 
+21:18:04|          |SetImage                            |SIA Spash image found at: C:\TIA_V21\DVD1\InstData\Resources\PictureSplash.png 
+21:18:04|          |GetLangString                       |LangKey: SetupCaption 
+21:18:04|          |GetLangString                       |return LangKey from SIA.ini: SetupCaption| Result: TIA Portal V21 STEP 7 + STEP 7 Safety + WinCC - Setup 
+21:18:04|          |GetLangString                       |LangKey: Copyright 
+21:18:04|          |GetLangString                       |return LangKey from ULF: Copyright| Result: © Siemens 2008 21:18:04|          |GetLangString                       |LangKey: CheckPrerequisites 
+21:18:04|          |GetLangString                       |return LangKey: CheckPrerequisites| Result: Checking prerequisites... 
+21:18:04|          |CSiaStarterApp::InitInstance        |show splash 
+21:18:04|          |                                    |SIA icon found at C:\TIA_V21\DVD1\InstData\Resources\ARP.ico| load ... 
+21:18:04|          |CatchSIASplash 0                    |Start looking for SIA Splash 
+21:18:05|          |GetLangString                       |LangKey: CheckPrerequisites 
+21:18:05|          |GetLangString                       |return LangKey: CheckPrerequisites| Result: Checking prerequisites... 
+21:18:05|          |                                    |SetProgress: Checking prerequisites... 
+21:18:05|          |CSiaStarterApp::InitInstance        |Calling signature validator 
+21:18:05|          |CSiaStarterApp::InitInstance        |Bundle path new: C:\TIA_V21\DVD1 
+21:18:05|          |CSiaStarterApp::InitInstance        |Resource path new: C:\TIA_V21\DVD1\InstData\Resources\ 
+21:18:05|          |TrustedCertificateStoreLib          | Pinned productive certificate found. 
+21:18:05|          |TrustedCertificateStoreLib          | Provided trust store directory does not exist. Returning with pinned productive certificates. 
+21:18:05|          |SignatureValidator                  |Certificate Types: Productive 
+21:18:05|          |SignatureValidator                  |=== Trust List Validation Results === 
+21:18:05|          |SignatureValidator                  |Total STL files processed: 0| Valid STL files: 0 
+21:18:05|          |SignatureValidator                  |Number of trusted certificates found: 1 
+21:18:06|          |SignatureValidator                  |Authenticity check validation succeeded: C:\TIA_V21\DVD1\InstData\Resources\Integrity\IntegrityValidator.exe 
+21:18:06|          |CSiaStarterApp::InitInstance        |Calling media integrity validator 
+21:18:06|          |IntegrityValidator                  |IntegrityValidator log file: C:\ProgramData\Siemens\Automation\Logfiles\Setup\SIA_Starter_MediaVal@2026-04-19_21-18-06.log 
+21:18:06|          |IntegrityValidator                  |Command line: "C:\TIA_V21\DVD1\InstData\Resources\Integrity\IntegrityValidator.exe" validate -i "C:\TIA_V21\DVD1" -l "C:\ProgramData\Siemens\Automation\Logfiles\Setup\SIA_Starter_MediaVal@2026-04-19_21-18-06.log" 
+21:18:06|          |IntegrityValidator                  |Successfully launched Integrity Validator. Waiting for completion... 

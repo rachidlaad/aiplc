@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "2aafkk+a0NS/sGLOugO5IrpR1NeAGB9mSddOW4ki+Ir2DI82sQikYpACm/ey1a48bqfwG84exzlN5p5nEeex6w==",
+  "success": true,
+  "projectFilePath": "/mnt/c/codex/adapters/siemens-tia-openness/Aiplc.TiaOpenness.Adapter/Aiplc.TiaOpenness.Adapter.csproj",
+  "expectedPackageFiles": [
+    "/root/.nuget/packages/microsoft.netframework.referenceassemblies/1.0.3/microsoft.netframework.referenceassemblies.1.0.3.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.netframework.referenceassemblies.net48/1.0.3/microsoft.netframework.referenceassemblies.net48.1.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
