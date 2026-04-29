@@ -1,4 +1,4 @@
-# Release workflow for codex-rs.
+# Release workflow for AIPLC.
 # To release, follow a workflow like:
 # ```
 # git tag -a rust-v0.1.0 -m "Release 0.1.0"
@@ -220,7 +220,7 @@ jobs:
         shell: bash
         run: |
           echo "CARGO_PROFILE_RELEASE_LTO: ${CARGO_PROFILE_RELEASE_LTO}"
-          cargo build --target ${{ matrix.target }} --release --timings --bin codex --bin codex-responses-api-proxy
+          cargo build --target ${{ matrix.target }} --release --timings --bin aiplc --bin codex-responses-api-proxy
 
       - name: Upload Cargo timings
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
@@ -257,14 +257,14 @@ jobs:
 
           target="${{ matrix.target }}"
           release_dir="target/${target}/release"
-          dmg_root="${RUNNER_TEMP}/codex-dmg-root"
-          volname="Codex (${target})"
-          dmg_path="${release_dir}/codex-${target}.dmg"
+          dmg_root="${RUNNER_TEMP}/aiplc-dmg-root"
+          volname="AIPLC (${target})"
+          dmg_path="${release_dir}/aiplc-${target}.dmg"
 
           # The previous "MacOS code signing (binaries)" step signs + notarizes the
           # built artifacts in `${release_dir}`. This step packages *those same*
           # signed binaries into a dmg.
-          codex_binary_path="${release_dir}/codex"
+          codex_binary_path="${release_dir}/aiplc"
           proxy_binary_path="${release_dir}/codex-responses-api-proxy"
 
           rm -rf "$dmg_root"
@@ -279,7 +279,7 @@ jobs:
             exit 1
           fi
 
-          ditto "$codex_binary_path" "${dmg_root}/codex"
+          ditto "$codex_binary_path" "${dmg_root}/aiplc"
           ditto "$proxy_binary_path" "${dmg_root}/codex-responses-api-proxy"
 
           rm -f "$dmg_path"
@@ -314,16 +314,16 @@ jobs:
           dest="dist/${{ matrix.target }}"
           mkdir -p "$dest"
 
-          cp target/${{ matrix.target }}/release/codex "$dest/codex-${{ matrix.target }}"
+          cp target/${{ matrix.target }}/release/aiplc "$dest/aiplc-${{ matrix.target }}"
           cp target/${{ matrix.target }}/release/codex-responses-api-proxy "$dest/codex-responses-api-proxy-${{ matrix.target }}"
 
           if [[ "${{ matrix.target }}" == *linux* ]]; then
-            cp target/${{ matrix.target }}/release/codex.sigstore "$dest/codex-${{ matrix.target }}.sigstore"
+            cp target/${{ matrix.target }}/release/aiplc.sigstore "$dest/aiplc-${{ matrix.target }}.sigstore"
             cp target/${{ matrix.target }}/release/codex-responses-api-proxy.sigstore "$dest/codex-responses-api-proxy-${{ matrix.target }}.sigstore"
           fi
 
           if [[ "${{ matrix.target }}" == *apple-darwin ]]; then
-            cp target/${{ matrix.target }}/release/codex-${{ matrix.target }}.dmg "$dest/codex-${{ matrix.target }}.dmg"
+            cp target/${{ matrix.target }}/release/aiplc-${{ matrix.target }}.dmg "$dest/aiplc-${{ matrix.target }}.dmg"
           fi
 
       - name: Compress artifacts
@@ -336,8 +336,8 @@ jobs:
           # For compatibility with environments that lack the `zstd` tool we
           # additionally create a `.tar.gz` alongside every binary we publish.
           # The end result is:
-          #   codex-<target>.zst          (existing)
-          #   codex-<target>.tar.gz       (new)
+          #   aiplc-<target>.zst          (existing)
+          #   aiplc-<target>.tar.gz       (new)
 
           # 1. Produce a .tar.gz for every file in the directory *before* we
           #    run `zstd --rm`, because that flag deletes the original files.
@@ -501,9 +501,9 @@ jobs:
         run: |
           ./scripts/stage_npm_packages.py \
             --release-version "$RELEASE_VERSION" \
-            --package codex \
-            --package codex-responses-api-proxy \
-            --package codex-sdk
+            --package aiplc \
+            --package aiplc-responses-api-proxy \
+            --package aiplc-sdk
 
       - name: Stage installer scripts
         run: |
@@ -542,19 +542,6 @@ jobs:
           tag: ${{ github.ref_name }}
           config: .github/dotslash-argument-comment-lint-config.json
 
-      - name: Trigger developers.openai.com deploy
-        # Only trigger the deploy if the release is not a pre-release.
-        # The deploy is used to update the developers.openai.com website with the new config schema json file.
-        if: ${{ !contains(steps.release_name.outputs.name, '-') }}
-        continue-on-error: true
-        env:
-          DEV_WEBSITE_VERCEL_DEPLOY_HOOK_URL: ${{ secrets.DEV_WEBSITE_VERCEL_DEPLOY_HOOK_URL }}
-        run: |
-          if ! curl -sS -f -o /dev/null -X POST "$DEV_WEBSITE_VERCEL_DEPLOY_HOOK_URL"; then
-            echo "::warning title=developers.openai.com deploy hook failed::Vercel deploy hook POST failed for ${GITHUB_REF_NAME}"
-            exit 1
-          fi
-
   # Publish to npm using OIDC authentication.
   # July 31, 2025: https://github.blog/changelog/2025-07-31-npm-trusted-publishing-with-oidc-is-generally-available/
   # npm docs: https://docs.npmjs.com/trusted-publishers
@@ -575,7 +562,7 @@ jobs:
           # Node 24 bundles npm >= 11.5.1, which trusted publishing requires.
           node-version: 24
           registry-url: "https://registry.npmjs.org"
-          scope: "@openai"
+          scope: "@uxarion"
 
       - name: Download npm tarballs from release
         env:
@@ -588,12 +575,12 @@ jobs:
           tag="$RELEASE_TAG"
           mkdir -p dist/npm
           patterns=(
-            "codex-npm-${version}.tgz"
-            "codex-npm-linux-*-${version}.tgz"
-            "codex-npm-darwin-*-${version}.tgz"
-            "codex-npm-win32-*-${version}.tgz"
-            "codex-responses-api-proxy-npm-${version}.tgz"
-            "codex-sdk-npm-${version}.tgz"
+            "aiplc-npm-${version}.tgz"
+            "aiplc-npm-linux-*-${version}.tgz"
+            "aiplc-npm-darwin-*-${version}.tgz"
+            "aiplc-npm-win32-*-${version}.tgz"
+            "aiplc-responses-api-proxy-npm-${version}.tgz"
+            "aiplc-sdk-npm-${version}.tgz"
           )
           for pattern in "${patterns[@]}"; do
             gh release download "$tag" \
@@ -626,12 +613,12 @@ jobs:
             tag=""
 
             case "${filename}" in
-              codex-npm-linux-*-"${VERSION}".tgz|codex-npm-darwin-*-"${VERSION}".tgz|codex-npm-win32-*-"${VERSION}".tgz)
-                platform="${filename#codex-npm-}"
+              aiplc-npm-linux-*-"${VERSION}".tgz|aiplc-npm-darwin-*-"${VERSION}".tgz|aiplc-npm-win32-*-"${VERSION}".tgz)
+                platform="${filename#aiplc-npm-}"
                 platform="${platform%-${VERSION}.tgz}"
                 tag="${prefix}${platform}"
                 ;;
-              codex-npm-"${VERSION}".tgz|codex-responses-api-proxy-npm-"${VERSION}".tgz|codex-sdk-npm-"${VERSION}".tgz)
+              aiplc-npm-"${VERSION}".tgz|aiplc-responses-api-proxy-npm-"${VERSION}".tgz|aiplc-sdk-npm-"${VERSION}".tgz)
                 tag="${NPM_TAG}"
                 ;;
               *)
@@ -680,11 +667,11 @@ jobs:
       - name: Publish to WinGet
         uses: vedantmgoyal9/winget-releaser@7bd472be23763def6e16bd06cc8b1cdfab0e2fd5
         with:
-          identifier: OpenAI.Codex
+          identifier: Uxarion.AIPLC
           version: ${{ needs.release.outputs.version }}
           release-tag: ${{ needs.release.outputs.tag }}
-          fork-user: openai-oss-forks
-          installers-regex: '^codex-(?:x86_64|aarch64)-pc-windows-msvc\.exe\.zip$'
+          fork-user: rachidlaad
+          installers-regex: '^aiplc-(?:x86_64|aarch64)-pc-windows-msvc\.exe\.zip$'
           token: ${{ secrets.WINGET_PUBLISH_PAT }}
 
   update-branch:

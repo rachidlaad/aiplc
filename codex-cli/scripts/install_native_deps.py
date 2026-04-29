@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install Codex native binaries (Rust CLI plus ripgrep helpers)."""
+"""Install AIPLC native binaries (Rust CLI plus ripgrep helpers)."""
 
 import argparse
 from contextlib import contextmanager
@@ -20,7 +20,7 @@ from urllib.request import urlopen
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 CODEX_CLI_ROOT = SCRIPT_DIR.parent
-DEFAULT_WORKFLOW_URL = "https://github.com/openai/codex/actions/runs/17952349351"  # rust-v0.40.0
+DEFAULT_WORKFLOW_URL = "https://github.com/rachidlaad/aiplc/actions/runs/17952349351"  # rust-v0.40.0
 VENDOR_DIR_NAME = "vendor"
 RG_MANIFEST = CODEX_CLI_ROOT / "bin" / "rg"
 BINARY_TARGETS = (
@@ -35,7 +35,7 @@ BINARY_TARGETS = (
 
 @dataclass(frozen=True)
 class BinaryComponent:
-    artifact_prefix: str  # matches the artifact filename prefix (e.g. codex-<target>.zst)
+    artifact_prefix: str  # matches the artifact filename prefix (e.g. aiplc-<target>.zst)
     dest_dir: str  # directory under vendor/<target>/ where the binary is installed
     binary_basename: str  # executable name inside dest_dir (before optional .exe)
     targets: tuple[str, ...] | None = None  # limit installation to specific targets
@@ -45,9 +45,9 @@ WINDOWS_TARGETS = tuple(target for target in BINARY_TARGETS if "windows" in targ
 
 BINARY_COMPONENTS = {
     "codex": BinaryComponent(
-        artifact_prefix="codex",
-        dest_dir="codex",
-        binary_basename="codex",
+        artifact_prefix="aiplc",
+        dest_dir="aiplc",
+        binary_basename="aiplc",
     ),
     "codex-responses-api-proxy": BinaryComponent(
         artifact_prefix="codex-responses-api-proxy",
@@ -56,13 +56,13 @@ BINARY_COMPONENTS = {
     ),
     "codex-windows-sandbox-setup": BinaryComponent(
         artifact_prefix="codex-windows-sandbox-setup",
-        dest_dir="codex",
+        dest_dir="aiplc",
         binary_basename="codex-windows-sandbox-setup",
         targets=WINDOWS_TARGETS,
     ),
     "codex-command-runner": BinaryComponent(
         artifact_prefix="codex-command-runner",
-        dest_dir="codex",
+        dest_dir="aiplc",
         binary_basename="codex-command-runner",
         targets=WINDOWS_TARGETS,
     ),
@@ -120,7 +120,7 @@ def _gha_group(title: str):
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Install native Codex binaries.")
+    parser = argparse.ArgumentParser(description="Install native AIPLC binaries.")
     parser.add_argument(
         "--workflow-url",
         help=(
@@ -135,7 +135,7 @@ def parse_args() -> argparse.Namespace:
         choices=tuple(list(BINARY_COMPONENTS) + ["rg"]),
         help=(
             "Limit installation to the specified components."
-            " May be repeated. Defaults to codex, codex-windows-sandbox-setup,"
+            " May be repeated. Defaults to aiplc, codex-windows-sandbox-setup,"
             " codex-command-runner, and rg."
         ),
     )
@@ -173,7 +173,7 @@ def main() -> int:
     print(f"Downloading native artifacts from workflow {workflow_id}...")
 
     with _gha_group(f"Download native artifacts from workflow {workflow_id}"):
-        with tempfile.TemporaryDirectory(prefix="codex-native-artifacts-") as artifacts_dir_str:
+        with tempfile.TemporaryDirectory(prefix="aiplc-native-artifacts-") as artifacts_dir_str:
             artifacts_dir = Path(artifacts_dir_str)
             _download_artifacts(workflow_id, artifacts_dir)
             install_binary_components(
@@ -267,7 +267,7 @@ def _download_artifacts(workflow_id: str, dest_dir: Path) -> None:
         "--dir",
         str(dest_dir),
         "--repo",
-        "openai/codex",
+        "rachidlaad/aiplc",
         workflow_id,
     ]
     subprocess.check_call(cmd)
