@@ -138,7 +138,7 @@ async fn windows_acceptance_connect_export_edit_compile_and_restore() -> anyhow:
             }),
         )
         .await?;
-    let marker = format!("CodexAcceptance-{}", std::process::id());
+    let marker = format!("AiplcAcceptance-{}", std::process::id());
 
     let edit_result: MutationResult = client
         .call_tool(

@@ -91,7 +91,10 @@ impl FromStr for BackendTransport {
                 "simulator backend is only available in debug/test builds; use subprocess for live TIA Portal"
                     .to_string(),
             ),
-            "mock" => Err("mock backend mode has been removed; use subprocess for live TIA Portal".to_string()),
+            "mock" => Err(
+                "legacy test backend mode has been removed; use subprocess for live TIA Portal"
+                    .to_string(),
+            ),
             "subprocess" => Ok(Self::Subprocess),
             other => Err(format!("unsupported backend transport: {other}")),
         }

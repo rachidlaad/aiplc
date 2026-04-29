@@ -93,13 +93,13 @@ mod tests {
     }
 
     #[test]
-    fn mock_backend_name_is_not_accepted() {
+    fn legacy_backend_name_is_not_accepted() {
         let err = Args::try_parse_from(["codex-plc-mcp-server", "--backend", "mock"])
-            .expect_err("mock backend mode should be removed");
+            .expect_err("legacy backend mode should be removed");
 
         assert!(
             err.to_string()
-                .contains("mock backend mode has been removed"),
+                .contains("legacy test backend mode has been removed"),
             "{err}"
         );
     }
