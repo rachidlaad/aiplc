@@ -16,7 +16,7 @@ import zipfile
 from pathlib import Path
 
 PACKAGE_NAME = "aiplc-cli-bin"
-PINNED_RUNTIME_VERSION = "0.1.1"
+PINNED_RUNTIME_VERSION = "0.1.2"
 REPO_SLUG = "rachidlaad/aiplc"
 
 
