@@ -451,7 +451,7 @@ impl MockBackend {
         if parent.summary.hmi_type.starts_with("alarm_") {
             return Err(BackendError::with_details(
                 "unsupported_parent",
-                "HMI alarms can only be created under a primary HMI object in the mock backend",
+                "HMI alarms can only be created under a primary HMI object in the simulator backend",
                 json!({ "hmi_object_id": params.hmi_object_id }),
             ));
         }

@@ -241,7 +241,7 @@ async fn mcp_mock_flow_supports_inspect_edit_import_and_compile() -> anyhow::Res
             TOOL_SET_BLOCK_HEADER,
             json!({
                 "object_id": motor_fb.object.object_id,
-                "header_author": "Codex PLC Test",
+                "header_author": "AIPLC Test",
                 "header_version": "2.1.1",
             }),
         )
@@ -277,7 +277,7 @@ async fn mcp_mock_flow_supports_inspect_edit_import_and_compile() -> anyhow::Res
             .as_deref()
             .expect("export text"),
     )?;
-    assert_eq!(after_edit_doc["header_author"], json!("Codex PLC Test"));
+    assert_eq!(after_edit_doc["header_author"], json!("AIPLC Test"));
     assert_eq!(after_edit_doc["header_version"], json!("2.1.1"));
 
     let mut imported_doc = after_edit_doc;
