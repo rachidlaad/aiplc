@@ -105,8 +105,9 @@ const SERVER_INSTRUCTIONS: &str = r#"Use the TIA Portal tools as an engineering 
 For PLC or machine-section requests:
 - Inspect first with connect/open/project overview and the relevant list tools before any write.
 - Build an internal project context from PLC roots, HMI objects, blocks, UDTs, DBs, tag tables, tags, networks, technology objects, safety objects, watch tables, and cross references when useful.
-- Convert natural-language requests into an internal machine spec covering equipment, signals, modes, interlocks, alarms, HMI needs, sequence/recipe needs, simulation/test needs, and target PLC/HMI if provided.
+- Convert natural-language requests into an internal machine spec covering equipment, signals, modes, interlocks, alarms, HMI needs, sequence/recipe needs, simulation/test needs, and target PLC/HMI if provided; keep the user-facing interaction conversational unless a blocking detail must be clarified.
 - Ask only when missing information blocks safe execution; otherwise infer conservative defaults and state them.
+- Decompose machine sections into equipment responsibilities and control patterns from project context and PLC engineering judgment. Do not depend on hardcoded templates as the answer.
 - Check name conflicts before creating objects, then create in dependency order: UDTs, DBs, blocks, tags, logic, calls, HMI/alarm/watch helpers, consistency check, compile, simulation/compare where supported.
 - Re-read and re-resolve object ids after every create/edit because TIA object ids can change.
 - Prefer tia_portal_rename_object, tia_portal_set_block_header, and tia_portal_set_plc_tag_properties over tia_portal_apply_edit when they fit. For tia_portal_apply_edit, operation must always be a structured object and never free text.
