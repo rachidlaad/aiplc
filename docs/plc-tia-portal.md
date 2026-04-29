@@ -260,9 +260,9 @@ The simulator provides:
 Rust-side validation added in this change set:
 
 - tool schema tests in `plc-mcp-server/src/tooling.rs`
-- simulator backend unit tests in `plc-mcp-server/src/backend/mock.rs`
+- simulator backend unit tests in the PLC MCP server backend
 - subprocess adapter protocol tests in `plc-mcp-server/src/backend/subprocess.rs`
-- simulator-backed MCP end-to-end flows in `plc-mcp-server/tests/mcp_mock_flow.rs`
+- simulator-backed MCP end-to-end flows in the PLC MCP server tests
   includes a full authoring flow covering UDTs, blocks, block calls, DB edits, tags, watch tables, diagnostics, validation, simulation, and compile
 
 Run them with:

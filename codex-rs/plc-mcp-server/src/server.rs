@@ -100,6 +100,20 @@ pub struct PlcToolServer {
     tools: Arc<Vec<Tool>>,
 }
 
+const SERVER_INSTRUCTIONS: &str = r#"Use the TIA Portal tools as an engineering workflow, not as isolated CRUD calls.
+
+For PLC or machine-section requests:
+- Inspect first with connect/open/project overview and the relevant list tools before any write.
+- Build an internal project context from PLC roots, HMI objects, blocks, UDTs, DBs, tag tables, tags, networks, technology objects, safety objects, watch tables, and cross references when useful.
+- Convert natural-language requests into an internal machine spec covering equipment, signals, modes, interlocks, alarms, HMI needs, sequence/recipe needs, simulation/test needs, and target PLC/HMI if provided.
+- Ask only when missing information blocks safe execution; otherwise infer conservative defaults and state them.
+- Check name conflicts before creating objects, then create in dependency order: UDTs, DBs, blocks, tags, logic, calls, HMI/alarm/watch helpers, consistency check, compile, simulation/compare where supported.
+- Re-read and re-resolve object ids after every create/edit because TIA object ids can change.
+- Prefer tia_portal_rename_object, tia_portal_set_block_header, and tia_portal_set_plc_tag_properties over tia_portal_apply_edit when they fit. For tia_portal_apply_edit, operation must always be a structured object and never free text.
+- Treat watch tables, HMI, simulation, and online compare as best-effort live features: verify read-back, continue only when later steps are independent, and report exact adapter errors.
+- Do not touch Main, existing production objects, safety objects, hardware/network configuration, online state, downloads, CPU state, or IO forcing unless the user explicitly asks and gives a concrete target.
+- Finish naturally with evidence: created/modified/skipped objects, exact failures, read-back verification, compile warnings/errors, and next manual steps."#;
+
 impl PlcToolServer {
     pub fn new(backend: Box<dyn PlcBackend>) -> Self {
         let supported_tool_names = backend.supported_tool_names();
@@ -122,10 +136,7 @@ impl ServerHandler for PlcToolServer {
                 .enable_tools()
                 .enable_tool_list_changed()
                 .build(),
-            instructions: Some(
-                "Prefer read tools first. Use object ids from inspection results for all mutations. Prefer tia_portal_rename_object, tia_portal_set_block_header, and tia_portal_set_plc_tag_properties over tia_portal_apply_edit when they fit the requested change. For tia_portal_apply_edit, operation must always be a structured object and never free text."
-                    .to_string(),
-            ),
+            instructions: Some(SERVER_INSTRUCTIONS.to_string()),
             ..ServerInfo::default()
         }
     }
@@ -599,4 +610,17 @@ fn plc_tag_properties_operation(
         external_writable,
         is_safety,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn server_instructions_define_engineering_workflow() {
+        assert!(SERVER_INSTRUCTIONS.contains("Inspect first"));
+        assert!(SERVER_INSTRUCTIONS.contains("internal machine spec"));
+        assert!(SERVER_INSTRUCTIONS.contains("create in dependency order"));
+        assert!(SERVER_INSTRUCTIONS.contains("Do not touch Main"));
+    }
 }

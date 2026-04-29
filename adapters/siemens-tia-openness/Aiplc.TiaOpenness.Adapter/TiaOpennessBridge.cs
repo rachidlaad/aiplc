@@ -2204,7 +2204,7 @@ namespace Aiplc.TiaOpenness.Adapter
         {
             throw new AdapterException(
                 "unsupported_live_operation",
-                "The requested PLC engineering action is not yet implemented in the live TIA Openness adapter. Use the mock backend for this capability or extend the adapter with a direct Openness implementation.",
+                "The requested PLC engineering action is not yet implemented in the live TIA Openness adapter. Extend the adapter with a direct Openness implementation for this capability.",
                 new Dictionary<string, object>
                 {
                     { "action", action },
