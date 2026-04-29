@@ -15,9 +15,9 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-PACKAGE_NAME = "codex-cli-bin"
-PINNED_RUNTIME_VERSION = "0.116.0-alpha.1"
-REPO_SLUG = "openai/codex"
+PACKAGE_NAME = "aiplc-cli-bin"
+PINNED_RUNTIME_VERSION = "0.1.0"
+REPO_SLUG = "rachidlaad/aiplc"
 
 
 class RuntimeSetupError(RuntimeError):
@@ -42,7 +42,7 @@ def ensure_runtime_package_installed(
     if installed_version is not None and _normalized_package_version(installed_version) == normalized_requested:
         return requested_version
 
-    with tempfile.TemporaryDirectory(prefix="codex-python-runtime-") as temp_root_str:
+    with tempfile.TemporaryDirectory(prefix="aiplc-python-runtime-") as temp_root_str:
         temp_root = Path(temp_root_str)
         archive_path = _download_release_archive(requested_version, temp_root)
         runtime_binary = _extract_runtime_binary(archive_path, temp_root)
@@ -75,19 +75,19 @@ def platform_asset_name() -> str:
 
     if system == "darwin":
         if machine in {"arm64", "aarch64"}:
-            return "codex-aarch64-apple-darwin.tar.gz"
+            return "aiplc-aarch64-apple-darwin.tar.gz"
         if machine in {"x86_64", "amd64"}:
-            return "codex-x86_64-apple-darwin.tar.gz"
+            return "aiplc-x86_64-apple-darwin.tar.gz"
     elif system == "linux":
         if machine in {"aarch64", "arm64"}:
-            return "codex-aarch64-unknown-linux-musl.tar.gz"
+            return "aiplc-aarch64-unknown-linux-musl.tar.gz"
         if machine in {"x86_64", "amd64"}:
-            return "codex-x86_64-unknown-linux-musl.tar.gz"
+            return "aiplc-x86_64-unknown-linux-musl.tar.gz"
     elif system == "windows":
         if machine in {"aarch64", "arm64"}:
-            return "codex-aarch64-pc-windows-msvc.exe.zip"
+            return "aiplc-aarch64-pc-windows-msvc.exe.zip"
         if machine in {"x86_64", "amd64"}:
-            return "codex-x86_64-pc-windows-msvc.exe.zip"
+            return "aiplc-x86_64-pc-windows-msvc.exe.zip"
 
     raise RuntimeSetupError(
         f"Unsupported runtime artifact platform: system={platform.system()!r}, "
@@ -96,7 +96,7 @@ def platform_asset_name() -> str:
 
 
 def runtime_binary_name() -> str:
-    return "codex.exe" if platform.system().lower() == "windows" else "codex"
+    return "aiplc.exe" if platform.system().lower() == "windows" else "aiplc"
 
 
 def _installed_runtime_version(python_executable: str | Path) -> str | None:
@@ -105,7 +105,7 @@ def _installed_runtime_version(python_executable: str | Path) -> str | None:
         "try:\n"
         "    from codex_cli_bin import bundled_codex_path\n"
         "    bundled_codex_path()\n"
-        "    print(json.dumps({'version': importlib.metadata.version('codex-cli-bin')}))\n"
+        "    print(json.dumps({'version': importlib.metadata.version('aiplc-cli-bin')}))\n"
         "except Exception:\n"
         "    sys.exit(1)\n"
     )
@@ -129,7 +129,7 @@ def _release_metadata(version: str) -> dict[str, object]:
     for include_auth in attempts:
         headers = {
             "Accept": "application/vnd.github+json",
-            "User-Agent": "codex-python-runtime-setup",
+            "User-Agent": "aiplc-python-runtime-setup",
         }
         if include_auth and token is not None:
             headers["Authorization"] = f"Bearer {token}"
@@ -160,7 +160,7 @@ def _download_release_archive(version: str, temp_root: Path) -> Path:
     )
     request = urllib.request.Request(
         browser_download_url,
-        headers={"User-Agent": "codex-python-runtime-setup"},
+        headers={"User-Agent": "aiplc-python-runtime-setup"},
     )
     try:
         with urllib.request.urlopen(request) as response, archive_path.open("wb") as fh:
@@ -260,7 +260,7 @@ def _extract_runtime_binary(archive_path: Path, temp_root: Path) -> Path:
         and (
             path.name == binary_name
             or path.name == archive_stem
-            or path.name.startswith("codex-")
+            or path.name.startswith("aiplc-")
         )
     ]
     if not candidates:
@@ -329,7 +329,7 @@ def _load_update_script_module(sdk_python_dir: Path):
 def _github_api_headers(accept: str) -> dict[str, str]:
     headers = {
         "Accept": accept,
-        "User-Agent": "codex-python-runtime-setup",
+        "User-Agent": "aiplc-python-runtime-setup",
     }
     token = _github_token()
     if token is not None:
