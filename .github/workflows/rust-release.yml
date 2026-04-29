@@ -214,7 +214,7 @@ jobs:
         shell: bash
         run: |
           echo "CARGO_PROFILE_RELEASE_LTO: ${CARGO_PROFILE_RELEASE_LTO}"
-          cargo build --target ${{ matrix.target }} --release --timings --bin aiplc --bin codex-responses-api-proxy
+          cargo build --target ${{ matrix.target }} --release --timings --bin codex --bin codex-responses-api-proxy
 
       - name: Upload Cargo timings
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
@@ -222,13 +222,6 @@ jobs:
           name: cargo-timings-rust-release-${{ matrix.target }}
           path: codex-rs/target/**/cargo-timings/cargo-timing.html
           if-no-files-found: warn
-
-      - if: ${{ contains(matrix.target, 'linux') }}
-        name: Cosign Linux artifacts
-        uses: ./.github/actions/linux-code-sign
-        with:
-          target: ${{ matrix.target }}
-          artifacts-dir: ${{ github.workspace }}/codex-rs/target/${{ matrix.target }}/release
 
       - if: ${{ runner.os == 'macOS' }}
         name: Build macOS dmg
@@ -245,7 +238,7 @@ jobs:
           # The previous "MacOS code signing (binaries)" step signs + notarizes the
           # built artifacts in `${release_dir}`. This step packages *those same*
           # signed binaries into a dmg.
-          codex_binary_path="${release_dir}/aiplc"
+          codex_binary_path="${release_dir}/codex"
           proxy_binary_path="${release_dir}/codex-responses-api-proxy"
 
           rm -rf "$dmg_root"
@@ -276,32 +269,14 @@ jobs:
             exit 1
           fi
 
-      - if: ${{ runner.os == 'macOS' }}
-        name: MacOS code signing (dmg)
-        uses: ./.github/actions/macos-code-sign
-        with:
-          target: ${{ matrix.target }}
-          sign-binaries: "false"
-          sign-dmg: "true"
-          apple-certificate: ${{ secrets.APPLE_CERTIFICATE_P12 }}
-          apple-certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          apple-notarization-key-p8: ${{ secrets.APPLE_NOTARIZATION_KEY_P8 }}
-          apple-notarization-key-id: ${{ secrets.APPLE_NOTARIZATION_KEY_ID }}
-          apple-notarization-issuer-id: ${{ secrets.APPLE_NOTARIZATION_ISSUER_ID }}
-
       - name: Stage artifacts
         shell: bash
         run: |
           dest="dist/${{ matrix.target }}"
           mkdir -p "$dest"
 
-          cp target/${{ matrix.target }}/release/aiplc "$dest/aiplc-${{ matrix.target }}"
+          cp target/${{ matrix.target }}/release/codex "$dest/aiplc-${{ matrix.target }}"
           cp target/${{ matrix.target }}/release/codex-responses-api-proxy "$dest/codex-responses-api-proxy-${{ matrix.target }}"
-
-          if [[ "${{ matrix.target }}" == *linux* ]]; then
-            cp target/${{ matrix.target }}/release/aiplc.sigstore "$dest/aiplc-${{ matrix.target }}.sigstore"
-            cp target/${{ matrix.target }}/release/codex-responses-api-proxy.sigstore "$dest/codex-responses-api-proxy-${{ matrix.target }}.sigstore"
-          fi
 
           if [[ "${{ matrix.target }}" == *apple-darwin ]]; then
             cp target/${{ matrix.target }}/release/aiplc-${{ matrix.target }}.dmg "$dest/aiplc-${{ matrix.target }}.dmg"
