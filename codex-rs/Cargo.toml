@@ -44,6 +44,7 @@ members = [
     "login",
     "codex-mcp",
     "mcp-server",
+    "plc-mcp-server",
     "model-provider-info",
     "models-manager",
     "network-proxy",
@@ -97,7 +98,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.0.0"
+version = "0.1.0"
 # Track the edition for all workspace crates in one place. Individual
 # crates can still override this value, but keeping it here means new
 # crates created with `cargo new -w ...` automatically inherit the 2024
@@ -149,6 +150,7 @@ codex-lmstudio = { path = "lmstudio" }
 codex-login = { path = "login" }
 codex-mcp = { path = "codex-mcp" }
 codex-mcp-server = { path = "mcp-server" }
+codex-plc-mcp-server = { path = "plc-mcp-server" }
 codex-model-provider-info = { path = "model-provider-info" }
 codex-models-manager = { path = "models-manager" }
 codex-network-proxy = { path = "network-proxy" }
