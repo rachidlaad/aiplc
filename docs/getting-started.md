@@ -1,3 +1,3 @@
-# Getting started with Codex CLI
+# Getting started with AIPLC CLI
 
-For an overview of Codex CLI features, see [this documentation](https://developers.openai.com/codex/cli/features#running-in-interactive-mode).
+Run `aiplc`, choose your authentication flow, then use the interactive TUI to inspect, plan, and execute work in the current engineering workspace.

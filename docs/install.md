@@ -33,7 +33,7 @@ cargo install --locked cargo-nextest
 cargo build
 
 # Launch the TUI with a sample prompt.
-cargo run --bin aiplc -- "explain this codebase to me"
+cargo run --bin aiplc -- "explain this TIA project to me"
 
 # After making changes, use the root justfile helpers (they default to codex-rs):
 just fmt
