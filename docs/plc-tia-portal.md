@@ -21,6 +21,32 @@ AIPLC CLI/TUI
 
 The Rust MCP server owns the tool contract and approval boundary. The Windows adapter owns TIA-specific assembly loading, object lookup, Openness calls, read-back verification, and compile reporting.
 
+## Engineer request workflow
+
+The intended product flow keeps the normal AIPLC/Claude-Code style
+conversation. There is no separate template mode and no separate report UI.
+When an engineer asks for a machine section, AIPLC should:
+
+1. inspect the live TIA project first
+2. build an internal context graph from PLCs, blocks, UDTs, DBs, tags, HMI,
+   networks, safety, technology objects, watch tables, and cross references
+3. convert the request into an internal machine spec with equipment, signals,
+   modes, interlocks, alarms, HMI needs, sequence/recipe needs, tests, and
+   target PLC/HMI when provided
+4. infer conservative defaults unless missing data blocks safe execution
+5. plan and execute in dependency order: data types, DBs, blocks, tags, logic,
+   calls, HMI/alarm/watch helpers, consistency check, compile, simulation or
+   compare when supported
+6. gate hardware, network, online, download, and safety actions instead of
+   running them silently
+7. answer naturally with exact evidence: created/modified/skipped objects,
+   read-back verification, compile result, warnings/errors, and next manual
+   actions when needed
+
+The tool layer gives the agent capabilities and safety boundaries. The model's
+normal planning and execution loop remains responsible for deciding what to do
+from the engineer's description.
+
 ## Exposed tools
 
 The product tool list is live-first. The default backend is `subprocess`, which
