@@ -20,10 +20,18 @@ pub fn bundled_models_response()
 
 /// Convert the client version string to a whole version string (e.g. "1.2.3-alpha.4" -> "1.2.3").
 pub fn client_version_to_whole() -> String {
-    format!(
-        "{}.{}.{}",
-        env!("CARGO_PKG_VERSION_MAJOR"),
-        env!("CARGO_PKG_VERSION_MINOR"),
-        env!("CARGO_PKG_VERSION_PATCH")
-    )
+    const MIN_REMOTE_COMPAT_VERSION: (u64, u64, u64) = (0, 99, 0);
+
+    let current = (
+        env!("CARGO_PKG_VERSION_MAJOR").parse::<u64>().unwrap_or(0),
+        env!("CARGO_PKG_VERSION_MINOR").parse::<u64>().unwrap_or(0),
+        env!("CARGO_PKG_VERSION_PATCH").parse::<u64>().unwrap_or(0),
+    );
+    let effective = if current < MIN_REMOTE_COMPAT_VERSION {
+        MIN_REMOTE_COMPAT_VERSION
+    } else {
+        current
+    };
+
+    format!("{}.{}.{}", effective.0, effective.1, effective.2)
 }

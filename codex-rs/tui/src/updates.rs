@@ -14,8 +14,13 @@ use std::path::PathBuf;
 
 use crate::version::CODEX_CLI_VERSION;
 
+const REMOTE_UPDATE_CHECK_ENABLED: bool = false;
+
 pub fn get_upgrade_version(config: &Config) -> Option<String> {
-    if !config.check_for_update_on_startup || is_source_build_version(CODEX_CLI_VERSION) {
+    if !REMOTE_UPDATE_CHECK_ENABLED
+        || !config.check_for_update_on_startup
+        || is_source_build_version(CODEX_CLI_VERSION)
+    {
         return None;
     }
 
@@ -56,8 +61,8 @@ struct VersionInfo {
 
 const VERSION_FILENAME: &str = "version.json";
 // We use the latest version from the cask if installation is via homebrew - homebrew does not immediately pick up the latest release and can lag behind.
-const HOMEBREW_CASK_API_URL: &str = "https://formulae.brew.sh/api/cask/codex.json";
-const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/openai/codex/releases/latest";
+const HOMEBREW_CASK_API_URL: &str = "https://formulae.brew.sh/api/cask/aiplc.json";
+const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/rachidlaad/aiplc/releases/latest";
 
 #[derive(Deserialize, Debug, Clone)]
 struct ReleaseInfo {
@@ -137,7 +142,10 @@ fn extract_version_from_latest_tag(latest_tag_name: &str) -> anyhow::Result<Stri
 /// Returns the latest version to show in a popup, if it should be shown.
 /// This respects the user's dismissal choice for the current latest version.
 pub fn get_upgrade_version_for_popup(config: &Config) -> Option<String> {
-    if !config.check_for_update_on_startup || is_source_build_version(CODEX_CLI_VERSION) {
+    if !REMOTE_UPDATE_CHECK_ENABLED
+        || !config.check_for_update_on_startup
+        || is_source_build_version(CODEX_CLI_VERSION)
+    {
         return None;
     }
 
@@ -188,10 +196,10 @@ mod tests {
     #[test]
     fn extract_version_from_brew_api_json() {
         //
-        // https://formulae.brew.sh/api/cask/codex.json
+        // https://formulae.brew.sh/api/cask/aiplc.json
         let cask_json = r#"{
-            "token": "codex",
-            "full_token": "codex",
+            "token": "aiplc",
+            "full_token": "aiplc",
             "tap": "homebrew/cask",
             "version": "0.96.0",
         }"#;
