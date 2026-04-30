@@ -7,8 +7,9 @@ use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(
+    name = "aiplc exec",
     version,
-    override_usage = "codex exec [OPTIONS] [PROMPT]\n       codex exec [OPTIONS] <COMMAND> [ARGS]"
+    override_usage = "aiplc exec [OPTIONS] [PROMPT]\n       aiplc exec [OPTIONS] <COMMAND> [ARGS]"
 )]
 pub struct Cli {
     /// Action to perform. If omitted, runs a new non-interactive session.
