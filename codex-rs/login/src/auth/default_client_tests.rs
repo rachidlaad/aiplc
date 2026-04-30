@@ -12,6 +12,17 @@ fn test_get_codex_user_agent() {
 }
 
 #[test]
+fn compatibility_version_has_minimum_floor() {
+    let version = compatibility_client_version();
+    let parsed = version
+        .split('.')
+        .map(|part| part.parse::<u64>().unwrap())
+        .collect::<Vec<_>>();
+    assert_eq!(parsed.len(), 3);
+    assert!(parsed >= vec![0, 124, 0]);
+}
+
+#[test]
 fn is_first_party_originator_matches_known_values() {
     assert_eq!(is_first_party_originator(DEFAULT_ORIGINATOR), true);
     assert_eq!(is_first_party_originator("codex-tui"), true);
