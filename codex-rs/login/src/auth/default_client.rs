@@ -34,6 +34,7 @@ pub static USER_AGENT_SUFFIX: LazyLock<Mutex<Option<String>>> = LazyLock::new(||
 pub const DEFAULT_ORIGINATOR: &str = "codex_cli_rs";
 pub const CODEX_INTERNAL_ORIGINATOR_OVERRIDE_ENV_VAR: &str = "CODEX_INTERNAL_ORIGINATOR_OVERRIDE";
 pub const RESIDENCY_HEADER_NAME: &str = "x-openai-internal-codex-residency";
+const MIN_REMOTE_COMPAT_VERSION: (u64, u64, u64) = (0, 124, 0);
 
 pub use codex_config::ResidencyRequirement;
 
@@ -129,7 +130,7 @@ pub fn is_first_party_chat_originator(originator_value: &str) -> bool {
 }
 
 pub fn get_codex_user_agent() -> String {
-    let build_version = env!("CARGO_PKG_VERSION");
+    let build_version = compatibility_client_version();
     let os_info = os_info::get();
     let originator = originator();
     let prefix = format!(
@@ -152,6 +153,21 @@ pub fn get_codex_user_agent() -> String {
 
     let candidate = format!("{prefix}{suffix}");
     sanitize_user_agent(candidate, &prefix)
+}
+
+pub fn compatibility_client_version() -> String {
+    let current = (
+        env!("CARGO_PKG_VERSION_MAJOR").parse::<u64>().unwrap_or(0),
+        env!("CARGO_PKG_VERSION_MINOR").parse::<u64>().unwrap_or(0),
+        env!("CARGO_PKG_VERSION_PATCH").parse::<u64>().unwrap_or(0),
+    );
+    let effective = if current < MIN_REMOTE_COMPAT_VERSION {
+        MIN_REMOTE_COMPAT_VERSION
+    } else {
+        current
+    };
+
+    format!("{}.{}.{}", effective.0, effective.1, effective.2)
 }
 
 /// Sanitize the user agent string.
