@@ -1,10 +1,4 @@
-<p align="center"><code>npm i -g @uxarion/aiplc</code><br />or <code>brew install --cask aiplc</code></p>
-<p align="center"><strong>AIPLC CLI</strong> is a coding agent from Uxarion that runs locally on your computer.
-<p align="center">
-  <img src="https://github.com/rachidlaad/aiplc/blob/main/.github/codex-cli-splash.png" alt="AIPLC CLI splash" width="80%" />
-</p>
-</br>
-Use AIPLC locally from your terminal, or integrate it into your editor and automation workflows through this repository’s CLI and SDK surfaces.</p>
+AIPLC is a local PLC engineering agent from Uxarion for Siemens TIA Portal workflows: an engineer describes the machine section, control logic, diagnostics, or commissioning task they want, and AIPLC inspects the live project, uses the available TIA engineering tools, applies contained PLC changes, validates them through read-back and compile results, and reports exactly what was created, modified, skipped, or blocked.
 
 ---
 
