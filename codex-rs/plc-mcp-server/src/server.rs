@@ -109,8 +109,13 @@ For PLC or machine-section requests:
 - Ask only when missing information blocks safe execution; otherwise infer conservative defaults and state them.
 - Check name conflicts before creating objects, then create in dependency order: UDTs, DBs, blocks, tags, logic, calls, HMI/alarm/watch helpers, consistency check, compile, simulation/compare where supported.
 - Re-read and re-resolve object ids after every create/edit because TIA object ids can change.
+- For first-pass generated PLC logic, prefer compile-safe DB-contained logic over project-specific direct I/O symbol wiring. Create PLC tags when the request needs an I/O surface, but do not assume the valid SCL addressing form for those tags unless the current project already proves it through existing blocks, exports, or compile evidence.
+- Do not assume PLC tag table-qualified syntax such as `"TagTable".TagName` will compile in SCL. If direct tag symbol use is necessary, treat the exact reference form as project-specific and prove it before scaling the pattern across the generated logic.
+- When symbol resolution is uncertain, keep the generated FB or FC internally coherent around created UDTs and DBs first, then wire external tags only after compile validation shows the symbol style is accepted in the chosen PLC root.
 - Prefer tia_portal_rename_object, tia_portal_set_block_header, and tia_portal_set_plc_tag_properties over tia_portal_apply_edit when they fit. For tia_portal_apply_edit, operation must always be a structured object and never free text.
 - Treat watch tables, HMI, simulation, and online compare as best-effort live features: verify read-back, continue only when later steps are independent, and report exact adapter errors.
+- If HMI objects are not exposed, skip HMI and alarm authoring cleanly instead of inventing targets. If watch-table entry creation fails or read-back is empty, treat that as a feature failure rather than as successful diagnostics coverage.
+- Use a compile-fix loop for generated objects: run consistency check and compile, map errors back to the generated object, apply only safe fixes, retry a small bounded number of times, and report the exact final state. Safe fixes include simplifying unresolved direct tag references back to DB-contained logic, reducing unsupported best-effort diagnostics helpers, and re-resolving stale object ids before follow-up writes.
 - Do not touch Main, existing production objects, safety objects, hardware/network configuration, online state, downloads, CPU state, or IO forcing unless the user explicitly asks and gives a concrete target.
 - Finish naturally with evidence: created/modified/skipped objects, exact failures, read-back verification, compile warnings/errors, and next manual steps."#;
 
