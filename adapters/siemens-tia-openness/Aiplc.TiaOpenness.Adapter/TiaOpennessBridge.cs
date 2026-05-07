@@ -998,6 +998,11 @@ namespace Aiplc.TiaOpenness.Adapter
             var expressions = GetList(parameters, "expressions", required: false);
             var root = FindWatchTableRoot(plcSoftware);
             var composition = GetPropertyValue(root, "WatchTables");
+            if (expressions != null && expressions.Count > 0)
+            {
+                return ImportWatchTableWithExpressions(composition, name, expressions);
+            }
+
             var created = CreateObjectInComposition(composition, name, new object[] { name });
             var changes = new List<Dictionary<string, object>>
             {
@@ -1018,20 +1023,6 @@ namespace Aiplc.TiaOpenness.Adapter
                 },
             };
 
-            if (expressions != null && expressions.Count > 0)
-            {
-                foreach (var expressionItem in expressions)
-                {
-                    var expression = expressionItem as Dictionary<string, object>;
-                    if (expression == null)
-                    {
-                        continue;
-                    }
-
-                    CreateWatchExpressionEntry(created, GetRequiredString(expression, "expression"));
-                }
-            }
-
             AddWatchExpressionVerification(created, expressions, verifiedFields);
 
             if (expressions != null)
@@ -1046,6 +1037,126 @@ namespace Aiplc.TiaOpenness.Adapter
             }
 
             return BuildVerifiedMutationResponse(created, changes, verifiedFields);
+        }
+
+        private object ImportWatchTableWithExpressions(
+            object composition,
+            string name,
+            IList<object> expressions)
+        {
+            var importPath = Path.Combine(
+                Path.GetTempPath(),
+                "codex-tia-watch-imports",
+                Guid.NewGuid().ToString("N") + ".xml");
+            Directory.CreateDirectory(Path.GetDirectoryName(importPath));
+            try
+            {
+                BuildWatchTableImportDocument(name, expressions).Save(importPath);
+                var imported = InvokeImport(composition, importPath, "none");
+                var created = ResolveImportedWatchTable(imported, composition, name);
+                if (created == null)
+                {
+                    throw new AdapterException(
+                        "verification_failed",
+                        "Watch-table import completed but the imported table could not be resolved by name.",
+                        new Dictionary<string, object> { { "name", name } });
+                }
+
+                var verifiedFields = new List<Dictionary<string, object>>
+                {
+                    new Dictionary<string, object>
+                    {
+                        { "field", "name" },
+                        { "expected", name },
+                        { "actual", ReadName(created) },
+                    },
+                };
+                AddWatchExpressionVerification(created, expressions, verifiedFields);
+
+                return BuildVerifiedMutationResponse(
+                    created,
+                    new List<Dictionary<string, object>>
+                    {
+                        new Dictionary<string, object>
+                        {
+                            { "field", "created" },
+                            { "before", null },
+                            { "after", true },
+                        },
+                        new Dictionary<string, object>
+                        {
+                            { "field", "expression_count" },
+                            { "before", 0 },
+                            { "after", expressions.Count },
+                        },
+                    },
+                    verifiedFields);
+            }
+            finally
+            {
+                if (File.Exists(importPath))
+                {
+                    File.Delete(importPath);
+                }
+            }
+        }
+
+        private XDocument BuildWatchTableImportDocument(string name, IList<object> expressions)
+        {
+            var nextId = 1;
+            var objectList = new XElement("ObjectList");
+            foreach (var expressionItem in expressions)
+            {
+                var expression = expressionItem as Dictionary<string, object>;
+                if (expression == null)
+                {
+                    continue;
+                }
+
+                objectList.Add(
+                    new XElement(
+                        "SW.WatchAndForceTables.PlcWatchTableEntry",
+                        new XAttribute("ID", nextId.ToString(CultureInfo.InvariantCulture)),
+                        new XAttribute("CompositionName", "Entries"),
+                        new XElement(
+                            "AttributeList",
+                            new XElement("Address", GetRequiredString(expression, "expression")))));
+                nextId++;
+            }
+
+            return new XDocument(
+                new XDeclaration("1.0", "utf-8", null),
+                new XElement(
+                    "Document",
+                    new XElement("Engineering", new XAttribute("version", _portalVersion ?? "V21")),
+                    new XElement(
+                        "DocumentInfo",
+                        new XElement("Created", DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture)),
+                        new XElement("ExportSetting", "WithDefaults")),
+                    new XElement(
+                        "SW.WatchAndForceTables.PlcWatchTable",
+                        new XAttribute("ID", "0"),
+                        new XElement("AttributeList", new XElement("Name", name)),
+                        objectList)));
+        }
+
+        private object ResolveImportedWatchTable(object imported, object composition, string name)
+        {
+            if (imported != null && string.Equals(ReadNameOrNull(imported), name, StringComparison.OrdinalIgnoreCase))
+            {
+                return imported;
+            }
+
+            foreach (var item in EnumerateObjects(imported))
+            {
+                if (string.Equals(ReadNameOrNull(item), name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return item;
+                }
+            }
+
+            return EnumerateObjects(composition)
+                .FirstOrDefault(item => string.Equals(ReadNameOrNull(item), name, StringComparison.OrdinalIgnoreCase));
         }
 
         private void AddWatchExpressionVerification(
@@ -1084,105 +1195,6 @@ namespace Aiplc.TiaOpenness.Adapter
                             readBackExpressionList.Select(expression => SafeToString(expression["expression"])))
                     },
                 });
-        }
-
-        private object CreateWatchExpressionEntry(object watchTable, string expressionText)
-        {
-            var entryType = TryFindType("Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableEntry");
-            if (entryType == null)
-            {
-                throw new AdapterException(
-                    "missing_type",
-                    "TIA Openness did not expose the PlcWatchTableEntry type.",
-                    new Dictionary<string, object> { { "expression", expressionText } });
-            }
-
-            Exception lastException = null;
-            var entries = GetPropertyValue(watchTable, "Entries");
-            foreach (var attributes in BuildWatchExpressionAttributeSets(expressionText))
-            {
-                try
-                {
-                    var created = CreateEngineeringCompositionChildObject(entries, entryType, attributes);
-                    if (created != null)
-                    {
-                        return created;
-                    }
-                }
-                catch (TargetInvocationException ex)
-                {
-                    lastException = ex.InnerException ?? ex;
-                }
-                catch (Exception ex)
-                {
-                    lastException = ex;
-                }
-            }
-
-            throw new AdapterException(
-                "unsupported_live_operation",
-                "The live adapter could not create a real watch-table expression entry through TIA Openness.",
-                new Dictionary<string, object>
-                {
-                    { "expression", expressionText },
-                    { "entry_type", entryType.FullName },
-                    { "composition_type", entries.GetType().FullName },
-                    { "last_error", lastException == null ? null : lastException.Message },
-                });
-        }
-
-        private static IEnumerable<List<KeyValuePair<string, object>>> BuildWatchExpressionAttributeSets(string expressionText)
-        {
-            yield return new List<KeyValuePair<string, object>>
-            {
-                new KeyValuePair<string, object>("Address", expressionText),
-            };
-            yield return new List<KeyValuePair<string, object>>
-            {
-                new KeyValuePair<string, object>("Name", expressionText),
-            };
-            yield return new List<KeyValuePair<string, object>>
-            {
-                new KeyValuePair<string, object>("Address", expressionText),
-                new KeyValuePair<string, object>("Name", expressionText),
-            };
-        }
-
-        private object CreateEngineeringCompositionChildObject(
-            object composition,
-            Type childType,
-            List<KeyValuePair<string, object>> attributes)
-        {
-            var engineeringCompositionType = FindType("Siemens.Engineering.IEngineeringComposition");
-            var createMethod = engineeringCompositionType.GetMethods()
-                .FirstOrDefault(
-                    method => method.Name == "Create" &&
-                        method.GetParameters().Length == 2);
-            if (createMethod == null)
-            {
-                throw new AdapterException(
-                    "missing_method",
-                    "TIA Openness IEngineeringComposition.Create was not found.",
-                    new Dictionary<string, object> { { "type", engineeringCompositionType.FullName } });
-            }
-
-            var created = createMethod.Invoke(composition, new object[] { childType, attributes });
-            if (created != null)
-            {
-                return created;
-            }
-
-            return EnumerateObjects(composition)
-                .FirstOrDefault(
-                    item =>
-                        string.Equals(
-                            TryGetOptionalString(item, "Address"),
-                            attributes.First().Value as string,
-                            StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(
-                            ReadNameOrNull(item),
-                            attributes.First().Value as string,
-                            StringComparison.OrdinalIgnoreCase));
         }
 
         private IEnumerable<object> EnumerateWatchExpressionCompositions(object watchTable)
