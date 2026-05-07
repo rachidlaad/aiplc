@@ -40,6 +40,10 @@ When an engineer asks for a machine section, AIPLC should:
    for first-pass logic generation, prefer compile-safe DB-contained control
    flow over project-specific direct PLC tag wiring unless the current project
    already proves the accepted symbol style
+   parallelize only truly independent creates; if a new UDT, DB, block, or
+   call references an object created earlier in the same run, serialize the
+   dependent step and re-read the project state first so TIA has materialized
+   the prerequisite object
 6. gate hardware, network, online, download, and safety actions instead of
    running them silently
 7. answer naturally with exact evidence: created/modified/skipped objects,
