@@ -998,11 +998,6 @@ namespace Aiplc.TiaOpenness.Adapter
             var expressions = GetList(parameters, "expressions", required: false);
             var root = FindWatchTableRoot(plcSoftware);
             var composition = GetPropertyValue(root, "WatchTables");
-            if (expressions != null && expressions.Count > 0)
-            {
-                return ImportWatchTableWithExpressions(composition, name, expressions);
-            }
-
             var created = CreateObjectInComposition(composition, name, new object[] { name });
             var changes = new List<Dictionary<string, object>>
             {
@@ -1023,7 +1018,47 @@ namespace Aiplc.TiaOpenness.Adapter
                 },
             };
 
+            AdapterException expressionCreationFailure = null;
+            if (expressions != null && expressions.Count > 0)
+            {
+                foreach (var expressionItem in expressions)
+                {
+                    var expression = expressionItem as Dictionary<string, object>;
+                    if (expression == null)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        CreateWatchExpressionEntry(created, GetRequiredString(expression, "expression"));
+                    }
+                    catch (AdapterException ex)
+                    {
+                        expressionCreationFailure = ex;
+                        break;
+                    }
+                }
+            }
+
             AddWatchExpressionVerification(created, expressions, verifiedFields);
+            if (expressionCreationFailure != null)
+            {
+                verifiedFields.Add(
+                    new Dictionary<string, object>
+                    {
+                        { "field", "expression_creation_status" },
+                        { "expected", "created" },
+                        { "actual", expressionCreationFailure.Code },
+                    });
+                verifiedFields.Add(
+                    new Dictionary<string, object>
+                    {
+                        { "field", "expression_creation_error" },
+                        { "expected", string.Empty },
+                        { "actual", expressionCreationFailure.Message },
+                    });
+            }
 
             if (expressions != null)
             {
@@ -1036,127 +1071,110 @@ namespace Aiplc.TiaOpenness.Adapter
                     });
             }
 
-            return BuildVerifiedMutationResponse(created, changes, verifiedFields);
+            return BuildMutationResponse(created, changes, verifiedFields, failOnVerificationMismatch: false);
         }
 
-        private object ImportWatchTableWithExpressions(
-            object composition,
-            string name,
-            IList<object> expressions)
+        private object CreateWatchExpressionEntry(object watchTable, string expressionText)
         {
-            var importPath = Path.Combine(
-                Path.GetTempPath(),
-                "codex-tia-watch-imports",
-                Guid.NewGuid().ToString("N") + ".xml");
-            Directory.CreateDirectory(Path.GetDirectoryName(importPath));
-            try
+            var entryType = TryFindType("Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableEntry");
+            if (entryType == null)
             {
-                BuildWatchTableImportDocument(name, expressions).Save(importPath);
-                var imported = InvokeImport(composition, importPath, "none");
-                var created = ResolveImportedWatchTable(imported, composition, name);
-                if (created == null)
-                {
-                    throw new AdapterException(
-                        "verification_failed",
-                        "Watch-table import completed but the imported table could not be resolved by name.",
-                        new Dictionary<string, object> { { "name", name } });
-                }
+                throw new AdapterException(
+                    "missing_type",
+                    "TIA Openness did not expose the PlcWatchTableEntry type.",
+                    new Dictionary<string, object> { { "expression", expressionText } });
+            }
 
-                var verifiedFields = new List<Dictionary<string, object>>
+            Exception lastException = null;
+            foreach (var attributes in BuildWatchExpressionAttributeSets(expressionText))
+            {
+                try
                 {
-                    new Dictionary<string, object>
+                    var created = CreateEngineeringObjectChildObject(
+                        watchTable,
+                        "Entries",
+                        entryType,
+                        attributes);
+                    if (created != null)
                     {
-                        { "field", "name" },
-                        { "expected", name },
-                        { "actual", ReadName(created) },
-                    },
-                };
-                AddWatchExpressionVerification(created, expressions, verifiedFields);
-
-                return BuildVerifiedMutationResponse(
-                    created,
-                    new List<Dictionary<string, object>>
-                    {
-                        new Dictionary<string, object>
-                        {
-                            { "field", "created" },
-                            { "before", null },
-                            { "after", true },
-                        },
-                        new Dictionary<string, object>
-                        {
-                            { "field", "expression_count" },
-                            { "before", 0 },
-                            { "after", expressions.Count },
-                        },
-                    },
-                    verifiedFields);
-            }
-            finally
-            {
-                if (File.Exists(importPath))
+                        return created;
+                    }
+                }
+                catch (TargetInvocationException ex)
                 {
-                    File.Delete(importPath);
+                    lastException = ex.InnerException ?? ex;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
                 }
             }
+
+            throw new AdapterException(
+                "unsupported_live_operation",
+                "The live adapter could not create a real watch-table expression entry through TIA Openness.",
+                new Dictionary<string, object>
+                {
+                    { "expression", expressionText },
+                    { "entry_type", entryType.FullName },
+                    { "target_type", watchTable.GetType().FullName },
+                    { "last_error", lastException == null ? null : lastException.Message },
+                });
         }
 
-        private XDocument BuildWatchTableImportDocument(string name, IList<object> expressions)
+        private static IEnumerable<List<KeyValuePair<string, object>>> BuildWatchExpressionAttributeSets(string expressionText)
         {
-            var nextId = 1;
-            var objectList = new XElement("ObjectList");
-            foreach (var expressionItem in expressions)
+            yield return new List<KeyValuePair<string, object>>
             {
-                var expression = expressionItem as Dictionary<string, object>;
-                if (expression == null)
-                {
-                    continue;
-                }
-
-                objectList.Add(
-                    new XElement(
-                        "SW.WatchAndForceTables.PlcWatchTableEntry",
-                        new XAttribute("ID", nextId.ToString(CultureInfo.InvariantCulture)),
-                        new XAttribute("CompositionName", "Entries"),
-                        new XElement(
-                            "AttributeList",
-                            new XElement("Address", GetRequiredString(expression, "expression")))));
-                nextId++;
-            }
-
-            return new XDocument(
-                new XDeclaration("1.0", "utf-8", null),
-                new XElement(
-                    "Document",
-                    new XElement("Engineering", new XAttribute("version", _portalVersion ?? "V21")),
-                    new XElement(
-                        "DocumentInfo",
-                        new XElement("Created", DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture)),
-                        new XElement("ExportSetting", "WithDefaults")),
-                    new XElement(
-                        "SW.WatchAndForceTables.PlcWatchTable",
-                        new XAttribute("ID", "0"),
-                        new XElement("AttributeList", new XElement("Name", name)),
-                        objectList)));
+                new KeyValuePair<string, object>("Address", expressionText),
+            };
+            yield return new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Name", expressionText),
+            };
+            yield return new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Address", expressionText),
+                new KeyValuePair<string, object>("Name", expressionText),
+            };
         }
 
-        private object ResolveImportedWatchTable(object imported, object composition, string name)
+        private object CreateEngineeringObjectChildObject(
+            object target,
+            string compositionName,
+            Type childType,
+            List<KeyValuePair<string, object>> attributes)
         {
-            if (imported != null && string.Equals(ReadNameOrNull(imported), name, StringComparison.OrdinalIgnoreCase))
+            var engineeringObjectType = FindType("Siemens.Engineering.IEngineeringObject");
+            var createMethod = engineeringObjectType.GetMethods()
+                .FirstOrDefault(
+                    method => method.Name == "Create" &&
+                        method.GetParameters().Length == 3);
+            if (createMethod == null)
             {
-                return imported;
+                throw new AdapterException(
+                    "missing_method",
+                    "TIA Openness IEngineeringObject.Create was not found.",
+                    new Dictionary<string, object> { { "type", engineeringObjectType.FullName } });
             }
 
-            foreach (var item in EnumerateObjects(imported))
+            var created = createMethod.Invoke(target, new object[] { compositionName, childType, attributes });
+            if (created != null)
             {
-                if (string.Equals(ReadNameOrNull(item), name, StringComparison.OrdinalIgnoreCase))
-                {
-                    return item;
-                }
+                return created;
             }
 
-            return EnumerateObjects(composition)
-                .FirstOrDefault(item => string.Equals(ReadNameOrNull(item), name, StringComparison.OrdinalIgnoreCase));
+            return EnumerateObjects(TryGetPropertyValue(target, compositionName))
+                .FirstOrDefault(
+                    item =>
+                        string.Equals(
+                            TryGetOptionalString(item, "Address"),
+                            attributes.First().Value as string,
+                            StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(
+                            ReadNameOrNull(item),
+                            attributes.First().Value as string,
+                            StringComparison.OrdinalIgnoreCase));
         }
 
         private void AddWatchExpressionVerification(
@@ -3793,8 +3811,17 @@ namespace Aiplc.TiaOpenness.Adapter
             List<Dictionary<string, object>> changes,
             List<Dictionary<string, object>> verifiedFields)
         {
+            return BuildMutationResponse(target, changes, verifiedFields, failOnVerificationMismatch: true);
+        }
+
+        private object BuildMutationResponse(
+            object target,
+            List<Dictionary<string, object>> changes,
+            List<Dictionary<string, object>> verifiedFields,
+            bool failOnVerificationMismatch)
+        {
             var verified = verifiedFields.All(field => Equals(field["expected"], field["actual"]));
-            if (!verified)
+            if (!verified && failOnVerificationMismatch)
             {
                 throw new AdapterException(
                     "verification_failed",
@@ -3819,7 +3846,7 @@ namespace Aiplc.TiaOpenness.Adapter
                     "verification",
                     new Dictionary<string, object>
                     {
-                        { "verified", true },
+                        { "verified", verified },
                         { "strategy", "read_back" },
                         { "checked_fields", verifiedFields },
                         { "exported_sha256", null },
