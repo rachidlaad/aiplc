@@ -37,6 +37,9 @@ When an engineer asks for a machine section, AIPLC should:
 5. plan and execute in dependency order: data types, DBs, blocks, tags, logic,
    calls, HMI/alarm/watch helpers, consistency check, compile, simulation or
    compare when supported
+   for first-pass logic generation, prefer compile-safe DB-contained control
+   flow over project-specific direct PLC tag wiring unless the current project
+   already proves the accepted symbol style
 6. gate hardware, network, online, download, and safety actions instead of
    running them silently
 7. answer naturally with exact evidence: created/modified/skipped objects,
@@ -144,6 +147,13 @@ Live actions are not masked by a second product mode:
 - Treat read tools as low-risk and mutating tools as approval-gated.
 - Never report a change as successful unless the API call succeeded and the post-change verification read also succeeded.
 - Always report touched objects, field-level changes, and compile outcomes.
+- Do not assume a PLC tag table-qualified SCL form such as `"TagTable".TagName`
+  is valid in a given project. Prove the accepted symbol style through existing
+  blocks, export evidence, or compile validation before expanding that pattern
+  across generated logic.
+- When compile errors show unresolved or mistyped direct tag references, fall
+  back to DB-contained logic first, recompile, and only then reintroduce
+  external tag wiring if the project proves the correct symbol form.
 - Stop on ambiguity, unsupported object kinds, unresolved references, or failed verification.
 - Use a disposable project copy for manual testing. Do not point this workflow at a production master project.
 
