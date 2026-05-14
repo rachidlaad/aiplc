@@ -110,7 +110,10 @@ For PLC or machine-section requests:
 - Check name conflicts before creating objects, then create in dependency order: UDTs, DBs, blocks, tags, logic, calls, HMI/alarm/watch helpers, consistency check, compile, simulation/compare where supported.
 - Only parallelize creates when they are truly independent. If an object references a type, DB, block, or tag helper created earlier in the run, serialize the dependent write and re-read the current engineering state first so TIA has materialized the prerequisite object.
 - Re-read and re-resolve object ids after every create/edit because TIA object ids can change.
+- Reuse existing project naming patterns and proven engineering structures before inventing new ones. If the current project does not prove a pattern, choose the most conservative compile-safe structure first.
 - For first-pass generated PLC logic, prefer compile-safe DB-contained logic over project-specific direct I/O symbol wiring. Create PLC tags when the request needs an I/O surface, but do not assume the valid SCL addressing form for those tags unless the current project already proves it through existing blocks, exports, or compile evidence.
+- Prefer minimal executable SCL over comment-only placeholder bodies for first-pass FB and FC generation. Do not treat a comment-only body as a reliable success path.
+- Do not depend on UDT or DB member comments unless the chosen PLC root already proves that the generated source pattern is accepted.
 - Do not assume PLC tag table-qualified syntax such as `"TagTable".TagName` will compile in SCL. If direct tag symbol use is necessary, treat the exact reference form as project-specific and prove it before scaling the pattern across the generated logic.
 - When symbol resolution is uncertain, keep the generated FB or FC internally coherent around created UDTs and DBs first, then wire external tags only after compile validation shows the symbol style is accepted in the chosen PLC root.
 - Prefer tia_portal_rename_object, tia_portal_set_block_header, and tia_portal_set_plc_tag_properties over tia_portal_apply_edit when they fit. For tia_portal_apply_edit, operation must always be a structured object and never free text.
@@ -627,6 +630,7 @@ mod tests {
         assert!(SERVER_INSTRUCTIONS.contains("Inspect first"));
         assert!(SERVER_INSTRUCTIONS.contains("internal machine spec"));
         assert!(SERVER_INSTRUCTIONS.contains("create in dependency order"));
+        assert!(SERVER_INSTRUCTIONS.contains("comment-only placeholder bodies"));
         assert!(SERVER_INSTRUCTIONS.contains("Do not touch Main"));
     }
 }
