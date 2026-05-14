@@ -665,6 +665,7 @@ namespace Aiplc.TiaOpenness.Adapter
             var beforeSource = GenerateSourceText(plcSoftware, new[] { target });
             var beforeBody = ExtractBlockBodyFromSource(beforeSource);
             var requestedBody = GetRequiredString(parameters, "block_body");
+            var preparedBody = PrepareBlockBodyForSource(requestedBody);
             target = FindNamedGeneratedObject(
                 GenerateObjectsFromSourceText(
                     plcSoftware,
@@ -689,7 +690,7 @@ namespace Aiplc.TiaOpenness.Adapter
                 new Dictionary<string, object>
                 {
                     { "field", "block_body" },
-                    { "expected", NormalizeSourceBodyText(requestedBody) },
+                    { "expected", NormalizeSourceBodyText(preparedBody) },
                     { "actual", NormalizeSourceBodyText(afterBody) },
                 });
 
@@ -3153,12 +3154,6 @@ namespace Aiplc.TiaOpenness.Adapter
             var builder = new StringBuilder();
             foreach (var member in members)
             {
-                var comment = GetString(member, "comment");
-                if (!string.IsNullOrWhiteSpace(comment))
-                {
-                    builder.Append(indent).Append("// ").Append(comment).Append(newline);
-                }
-
                 builder.Append(indent)
                     .Append(QuotePlcIdentifier(GetRequiredString(member, "name")))
                     .Append(" : ")
