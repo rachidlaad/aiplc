@@ -1,0 +1,141 @@
+name: claim-aiplc-npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Unscoped aiplc version to publish"
+        required: true
+        default: "0.2.0"
+
+concurrency:
+  group: claim-aiplc-npm
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish-unscoped-aiplc:
+    if: github.repository == 'rachidlaad/aiplc'
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN1 }}
+      VERSION: ${{ inputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        with:
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Validate publish token
+        run: |
+          set -euo pipefail
+          if [[ -z "${NODE_AUTH_TOKEN}" ]]; then
+            echo "NPM_TOKEN1 is missing."
+            exit 1
+          fi
+          npm whoami
+
+      - name: Ensure unscoped name is still free
+        run: |
+          set -euo pipefail
+          if npm view aiplc name >/dev/null 2>&1; then
+            echo "The unscoped npm package name 'aiplc' is already occupied."
+            exit 1
+          fi
+          echo "aiplc is still available."
+
+      - name: Build minimal claim package
+        run: |
+          set -euo pipefail
+          claim_dir="${RUNNER_TEMP}/aiplc-npm-claim"
+          mkdir -p "${claim_dir}/bin"
+
+          cat > "${claim_dir}/package.json" <<EOF
+          {
+            "name": "aiplc",
+            "version": "${VERSION}",
+            "description": "Official placeholder package for the AIPLC CLI.",
+            "license": "Apache-2.0",
+            "type": "module",
+            "bin": {
+              "aiplc": "bin/aiplc.js"
+            },
+            "files": [
+              "bin",
+              "README.md"
+            ],
+            "repository": {
+              "type": "git",
+              "url": "git+https://github.com/rachidlaad/aiplc.git"
+            },
+            "homepage": "https://github.com/rachidlaad/aiplc",
+            "bugs": {
+              "url": "https://github.com/rachidlaad/aiplc/issues"
+            },
+            "keywords": [
+              "plc",
+              "siemens",
+              "tia-portal",
+              "automation",
+              "cli"
+            ],
+            "engines": {
+              "node": ">=18"
+            }
+          }
+          EOF
+
+          cat > "${claim_dir}/README.md" <<'EOF'
+          # aiplc
+
+          This package name is reserved for the official AIPLC CLI project.
+
+          Project repository:
+
+          - https://github.com/rachidlaad/aiplc
+
+          This initial release is a placeholder so the unscoped npm package name is not claimed by another publisher while the full npm distribution is finalized.
+          EOF
+
+          cat > "${claim_dir}/bin/aiplc.js" <<'EOF'
+          #!/usr/bin/env node
+
+          console.error(
+            [
+              "The unscoped `aiplc` npm package is currently a placeholder.",
+              "Project repository: https://github.com/rachidlaad/aiplc",
+              "The full npm distribution will be published from that project."
+            ].join("\n")
+          );
+
+          process.exitCode = 1;
+          EOF
+
+          chmod 755 "${claim_dir}/bin/aiplc.js"
+
+      - name: Dry run
+        working-directory: ${{ runner.temp }}/aiplc-npm-claim
+        run: |
+          set -euo pipefail
+          npm publish --dry-run --access public
+
+      - name: Publish
+        working-directory: ${{ runner.temp }}/aiplc-npm-claim
+        run: |
+          set -euo pipefail
+          npm publish --access public
+
+      - name: Publish summary
+        run: |
+          {
+            echo "## aiplc npm claim"
+            echo
+            echo "- Published: \`aiplc@${VERSION}\`"
+            echo "- npm: https://www.npmjs.com/package/aiplc"
+          } >> "$GITHUB_STEP_SUMMARY"
